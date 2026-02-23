@@ -1,4 +1,5 @@
 #include "App.h"
+#include "World.h"
 
 App::App()
 :	window(sf::VideoMode({1280, 720}), "Simulation Engine")
@@ -31,11 +32,35 @@ void App::run() {
 	}
 }
 
-void App::processEvents() {
-	while (auto event = window.pollEvent()) {
-		if (event->is<sf::Event::Closed>())
-			window.close();
-	}
+void App::processEvents()
+{
+    while (auto optEvent = window.pollEvent())
+    {
+        const sf::Event& event = *optEvent;
+
+        // Window close
+        if (const auto* closed = event.getIf<sf::Event::Closed>())
+        {
+            window.close();
+        }
+
+        // Mouse pressed
+        if (const auto* mouse =
+            event.getIf<sf::Event::MouseButtonPressed>())
+        {
+            if (mouse->button == sf::Mouse::Button::Left)
+            {
+                auto mousePos = sf::Mouse::getPosition(window);
+
+                Vec2 worldPos(
+                    static_cast<float>(mousePos.x),
+                    static_cast<float>(mousePos.y)
+                );
+
+                world.spawnAt(worldPos);
+            }
+        }
+    }
 }
 
 void App::update(float dt) {

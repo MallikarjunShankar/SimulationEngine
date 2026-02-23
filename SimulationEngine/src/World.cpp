@@ -1,4 +1,5 @@
 #include "World.h"
+#include "Random.h"
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
@@ -44,4 +45,17 @@ void World::render(sf::RenderWindow& window) {
 	for (auto& entity : entities) {
 		entity->render(window);
 	}
+}
+
+void World::spawnAt(const Vec2& position) {
+	auto entity = std::make_unique<Entity>();
+
+	entity->position = position;
+
+	entity->velocity = Vec2(
+		Random::range(-100.f, 100.f),
+		Random::range(-100.f, 100.f)
+	);
+
+	entities.push_back(std::move(entity));
 }

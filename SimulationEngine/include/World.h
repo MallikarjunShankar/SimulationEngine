@@ -11,6 +11,7 @@ public:
 	void update(float dt);
 	void spawnEntity();
 	void render(sf::RenderWindow& window);
+	void spawnAt(const Vec2& position);
 
 private:
 	void cleanup();

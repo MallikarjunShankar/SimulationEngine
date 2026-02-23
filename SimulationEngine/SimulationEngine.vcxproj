@@ -23,6 +23,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Physics.cpp" />
+    <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
@@ -30,6 +31,7 @@
     <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\Physics.h" />
+    <ClInclude Include="include\Random.h" />
     <ClInclude Include="include\Vec2.h" />
     <ClInclude Include="include\World.h" />
   </ItemGroup>

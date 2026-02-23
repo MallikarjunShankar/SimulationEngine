@@ -1,0 +1,21 @@
+#pragma once
+
+#include <vector>
+#include <memory>
+#include "Entity.h"
+
+class World {
+public:
+	World();
+
+	void update(float dt);
+	void spawnEntity();
+	void render(sf::RenderWindow& window);
+
+private:
+	void cleanup();
+
+private:
+	std::vector<std::unique_ptr<Entity>> entities;
+	int nextId;
+};

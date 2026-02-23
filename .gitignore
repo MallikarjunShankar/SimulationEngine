@@ -1,0 +1,17 @@
+# Visual Studio
+.vs/
+*.vcxproj.user
+
+# Build output
+x64/
+Debug/
+Release/
+
+# CMake/Temp
+*.log
+*.obj
+*.pdb
+*.ilk
+
+# SFML DLL copies
+*.dll

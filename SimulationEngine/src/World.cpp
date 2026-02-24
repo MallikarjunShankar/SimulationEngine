@@ -1,11 +1,11 @@
 #include "World.h"
 #include "Random.h"
+#include "ForceSystem.h"
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
-World::World()
-	:nextId(0)
-{
+World::World() {
+	systems.push_back(std::make_unique<ForceSystem>());
 }
 
 void World::spawnEntity() {
@@ -18,12 +18,14 @@ void World::spawnEntity() {
 }
 
 void World::update(float dt) {
-	for (auto& e : entities) {
-		Vec2 force(50.f, 0.f);
+	// systems modify entities
+	for (auto& system : systems) {
+		system->update(entities, dt);
+	}
 
+	// entities integrate motion
+	for (auto& e : entities) {
 		e->update(dt);
-		
-		// ensure entity stays within world bounds
 		resolveBounds(*e);
 	}
 

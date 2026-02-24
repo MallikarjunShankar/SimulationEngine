@@ -1,11 +1,10 @@
 #pragma once
+#include "System.h"
 
-#include <vector>
-#include <memory>
-
-class Entity;
-
-class ForceSystem {
+class ForceSystem : public System
+{
 public:
-	void apply(std::vector<std::unique_ptr<Entity>>& entities);
+    void update(
+        std::vector<std::unique_ptr<Entity>>& entities,
+        float dt) override;
 };

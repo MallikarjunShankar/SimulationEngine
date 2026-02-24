@@ -3,11 +3,13 @@
 #include <vector>
 #include <memory>
 #include "Entity.h"
+#include "ForceSystem.h"
 
 class World {
 public:
 	World();
 
+	ForceSystem forceSystem;
 	void update(float dt);
 	void spawnEntity();
 	void render(sf::RenderWindow& window);

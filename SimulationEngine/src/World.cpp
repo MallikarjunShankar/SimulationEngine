@@ -18,14 +18,13 @@ void World::spawnEntity() {
 }
 
 void World::update(float dt) {
-	for (auto& entity : entities) {
+	for (auto& e : entities) {
 		Vec2 force(50.f, 0.f);
 
-		entity->applyForce(force);
-		entity->update(dt);
-
+		e->update(dt);
+		
 		// ensure entity stays within world bounds
-		resolveBounds(*entity);
+		resolveBounds(*e);
 	}
 
 	cleanup();

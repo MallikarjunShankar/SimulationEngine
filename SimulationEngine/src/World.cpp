@@ -23,6 +23,9 @@ void World::update(float dt) {
 
 		entity->applyForce(force);
 		entity->update(dt);
+
+		// ensure entity stays within world bounds
+		resolveBounds(*entity);
 	}
 
 	cleanup();
@@ -58,4 +61,32 @@ void World::spawnAt(const Vec2& position) {
 	);
 
 	entities.push_back(std::move(entity));
+}
+
+void World::resolveBounds(Entity& entity) {
+	float r = entity.radius;
+	
+	// left bound
+	if (entity.position.x - r < 0.f) {
+		entity.position.x = r;
+		entity.velocity.x *= -1.f;
+	}
+
+	// right bound
+	if (entity.position.x + r > width){
+		entity.position.x = width - r;
+		entity.velocity.x *= -1.f;
+	}
+
+	// top bound
+	if (entity.position.y - r < 0.f) {
+		entity.position.y = r;
+		entity.velocity.y *= -1.f;
+	}
+
+	// bottom bound
+	if (entity.position.y + r > height) {
+		entity.position.y = height - r;
+		entity.velocity.y *= -1.f;
+	}
 }

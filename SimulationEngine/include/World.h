@@ -15,8 +15,11 @@ public:
 
 private:
 	void cleanup();
+	void resolveBounds(Entity& entity);
 
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	int nextId;
+	float width = 1280.f;
+	float height = 720.f;
 };

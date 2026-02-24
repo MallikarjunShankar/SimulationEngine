@@ -3,17 +3,16 @@
 #include <vector>
 #include <memory>
 #include "Entity.h"
-#include "ForceSystem.h"
 #include "System.h"
 
+class SpawnSystem;
 class World {
 public:
 	World();
 
 	void update(float dt);	
-	void spawnEntity();
 	void render(sf::RenderWindow& window);
-	void spawnAt(const Vec2& position);
+	void enqueueSpawn(const Vec2& position);
 
 private:
 	void cleanup();
@@ -25,5 +24,6 @@ private:
 	int nextId;
 	float width = 1280.f;
 	float height = 720.f;
+	SpawnSystem* spawnSystem = nullptr;
 
 };

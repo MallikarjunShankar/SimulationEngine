@@ -25,6 +25,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Random.cpp" />
+    <ClCompile Include="src\SpawnSystem.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
     <ClCompile Include="src\World.cpp" />
@@ -35,6 +36,8 @@
     <ClInclude Include="include\ForceSystem.h" />
     <ClInclude Include="include\Physics.h" />
     <ClInclude Include="include\Random.h" />
+    <ClInclude Include="include\SpawnRequest.h" />
+    <ClInclude Include="include\SpawnSystem.h" />
     <ClInclude Include="include\System.h" />
     <ClInclude Include="include\Vec2.h" />
     <ClInclude Include="include\World.h" />

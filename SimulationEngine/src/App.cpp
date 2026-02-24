@@ -6,7 +6,6 @@ App::App()
 {
 	window.setFramerateLimit(144);
 
-	world.spawnEntity();
 }
 
 void App::run() {
@@ -57,7 +56,7 @@ void App::processEvents()
                     static_cast<float>(mousePos.y)
                 );
 
-                world.spawnAt(worldPos);
+				world.enqueueSpawn(worldPos);
             }
         }
     }

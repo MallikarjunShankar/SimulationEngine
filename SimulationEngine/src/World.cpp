@@ -1,20 +1,21 @@
 #include "World.h"
 #include "Random.h"
 #include "ForceSystem.h"
+#include "SpawnSystem.h"
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
 World::World() {
+	auto spawn = std::make_unique<SpawnSystem>(*this);
+
+	spawnSystem = spawn.get();
+	systems.push_back(std::move(spawn));
+
 	systems.push_back(std::make_unique<ForceSystem>());
 }
 
-void World::spawnEntity() {
-	auto entity = std::make_unique<Entity>();
-	
-	entity->id = nextId++;
-	entity->position = Vec2(640.f, 360.f);
-
-	entities.push_back(std::move(entity));
+void World::enqueueSpawn(const Vec2& position) {
+	spawnSystem->enqueue({ position });
 }
 
 void World::update(float dt) {
@@ -49,19 +50,6 @@ void World::render(sf::RenderWindow& window) {
 	for (auto& entity : entities) {
 		entity->render(window);
 	}
-}
-
-void World::spawnAt(const Vec2& position) {
-	auto entity = std::make_unique<Entity>();
-
-	entity->position = position;
-
-	entity->velocity = Vec2(
-		Random::range(-100.f, 100.f),
-		Random::range(-100.f, 100.f)
-	);
-
-	entities.push_back(std::move(entity));
 }
 
 void World::resolveBounds(Entity& entity) {

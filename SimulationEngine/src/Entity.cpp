@@ -22,6 +22,11 @@ void Entity::applyForce(const Vec2& force)
 void Entity::update(float dt)
 {
     velocity += acceleration * dt;
+    float factor = 1.f - linearDamping * dt;
+    if (factor < 0.f) factor = 0.f;
+
+	velocity *= factor;
+
     position += velocity * dt;
 
     acceleration = Vec2(0.f, 0.f);

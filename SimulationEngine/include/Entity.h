@@ -21,6 +21,7 @@ public:
 	float mass;
 	float radius;
 	float energy;
+	float linearDamping = 0.99f;
 
 	bool alive;
 };

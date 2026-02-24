@@ -50,3 +50,13 @@ Vec2& Vec2::operator-=(const Vec2& rhs) {
 	y -= rhs.y;
 	return *this;
 }
+Vec2& Vec2::operator*=(float scalar) {
+	x *= scalar;
+	y *= scalar;
+	return *this;
+}
+Vec2& Vec2::operator/=(float scalar) {
+	x /= scalar;
+	y /= scalar;
+	return *this;
+}

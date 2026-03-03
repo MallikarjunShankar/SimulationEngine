@@ -59,12 +59,21 @@ void App::processEvents()
 				world.enqueueSpawn(worldPos);
             }
         }
+
+        // Space pressed
+        if (const auto* key = event.getIf<sf::Event::KeyPressed>())
+        {
+            if (key->code == sf::Keyboard::Key::Space) {
+                world.requestPauseToggle();
+            }
+        }
     }
 }
 
 void App::update(float dt) {
-	world.update(dt);
+    world.update(dt);
 }
+       
 
 void App::render() {
 	window.clear();

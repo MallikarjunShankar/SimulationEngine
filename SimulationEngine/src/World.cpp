@@ -18,8 +18,12 @@ void World::enqueueSpawn(const Vec2& position) {
 	spawnSystem->enqueue({ position });
 }
 
-void World::update(float dt)
-{
+void World::update(float dt) {
+	if (pauseToggleRequested) {
+		paused = !paused;
+		pauseToggleRequested = false;
+	}
+
 	if (paused)
 		return;
 
@@ -103,4 +107,8 @@ float World::getTimeScale() const {
 
 float World::getSimulationTime() const {
 	return simulationTime;
+}
+
+void World::requestPauseToggle() {
+	pauseToggleRequested = true;
 }

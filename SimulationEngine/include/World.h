@@ -21,6 +21,7 @@ private:
 public:
 	void setPaused(bool value);
 	bool isPaused() const;
+	void requestPauseToggle();
 	
 	void setTimeScale(float scale);
 	float getTimeScale() const;
@@ -38,5 +39,6 @@ private:
 	float simulationTime = 0.f;
 	float timeScale = 1.f;
 	bool paused = false;
+	bool pauseToggleRequested = false;
 
 };

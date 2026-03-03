@@ -18,6 +18,14 @@ private:
 	void cleanup();
 	void resolveBounds(Entity& entity);
 
+public:
+	void setPaused(bool value);
+	bool isPaused() const;
+	
+	void setTimeScale(float scale);
+	float getTimeScale() const;
+	float getSimulationTime() const;
+
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::vector<std::unique_ptr<System>> systems;
@@ -25,5 +33,10 @@ private:
 	float width = 1280.f;
 	float height = 720.f;
 	SpawnSystem* spawnSystem = nullptr;
+
+private:
+	float simulationTime = 0.f;
+	float timeScale = 1.f;
+	bool paused = false;
 
 };

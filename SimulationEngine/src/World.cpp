@@ -18,15 +18,20 @@ void World::enqueueSpawn(const Vec2& position) {
 	spawnSystem->enqueue({ position });
 }
 
-void World::update(float dt) {
-	// systems modify entities
+void World::update(float dt)
+{
+	if (paused)
+		return;
+
+	const float scaledDt = dt * timeScale;
+	simulationTime += scaledDt;
+
 	for (auto& system : systems) {
-		system->update(entities, dt);
+		system->update(entities, scaledDt);
 	}
 
-	// entities integrate motion
 	for (auto& e : entities) {
-		e->update(dt);
+		e->update(scaledDt);
 		resolveBounds(*e);
 	}
 
@@ -78,4 +83,24 @@ void World::resolveBounds(Entity& entity) {
 		entity.position.y = height - r;
 		entity.velocity.y *= -1.f;
 	}
+}
+
+void World::setPaused(bool value) {
+	paused = value;
+}
+
+bool World::isPaused() const {
+	return paused;
+}
+
+void World::setTimeScale(float scale) {
+	timeScale = scale;
+}
+
+float World::getTimeScale() const {
+	return timeScale;
+}
+
+float World::getSimulationTime() const {
+	return simulationTime;
 }

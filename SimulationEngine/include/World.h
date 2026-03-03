@@ -28,6 +28,8 @@ public:
 	float getSimulationTime() const;
 
 	void requestSingleStep();
+	void requestTimeScaleDelta(float delta);
+	void requestTimeScaleReset();
 
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
@@ -44,4 +46,6 @@ private:
 	bool pauseToggleRequested = false;
 
 	bool stepRequested = false;
+	float pendingTimeScaleDelta = 0.f;
+	bool resetTimeScaleRequested = false;
 };

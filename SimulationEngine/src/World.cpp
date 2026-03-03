@@ -42,6 +42,20 @@ void World::update(float dt) {
 		return;
 	}
 
+	if (resetTimeScaleRequested) {
+		timeScale = 1.f;
+		resetTimeScaleRequested = false;
+	}
+
+	if (pendingTimeScaleDelta != 0.f) {
+		timeScale += pendingTimeScaleDelta;
+		
+		if (timeScale < 0.f) timeScale = 0.f;
+		if (timeScale > 4.f) timeScale = 4.f;
+
+		pendingTimeScaleDelta = 0.f;
+	}
+
 	const float scaledDt = dt * timeScale;
 	simulationTime += scaledDt;
 
@@ -130,4 +144,12 @@ void World::requestPauseToggle() {
 
 void World::requestSingleStep() {
 	stepRequested = true;
+}
+
+void World::requestTimeScaleDelta(float delta) {
+	pendingTimeScaleDelta += delta;
+}
+
+void World::requestTimeScaleReset() {
+	resetTimeScaleRequested = true;
 }

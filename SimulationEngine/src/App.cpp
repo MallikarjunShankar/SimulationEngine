@@ -69,6 +69,18 @@ void App::processEvents()
             if (key->code == sf::Keyboard::Key::Right) {
                 world.requestSingleStep();
             }
+
+            if (key->code == sf::Keyboard::Key::Up) {
+                world.requestTimeScaleDelta(0.25f);
+            }
+
+            if (key->code == sf::Keyboard::Key::Down) {
+                world.requestTimeScaleDelta(-0.25f);
+			}
+
+            if (key->code == sf::Keyboard::Key::R) {
+                world.requestTimeScaleReset();
+            }
         }
     }
 }

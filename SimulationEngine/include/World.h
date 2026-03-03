@@ -27,6 +27,8 @@ public:
 	float getTimeScale() const;
 	float getSimulationTime() const;
 
+	void requestSingleStep();
+
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::vector<std::unique_ptr<System>> systems;
@@ -41,4 +43,5 @@ private:
 	bool paused = false;
 	bool pauseToggleRequested = false;
 
+	bool stepRequested = false;
 };

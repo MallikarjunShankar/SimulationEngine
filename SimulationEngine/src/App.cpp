@@ -60,11 +60,14 @@ void App::processEvents()
             }
         }
 
-        // Space pressed
         if (const auto* key = event.getIf<sf::Event::KeyPressed>())
         {
             if (key->code == sf::Keyboard::Key::Space) {
                 world.requestPauseToggle();
+            }
+
+            if (key->code == sf::Keyboard::Key::Right) {
+                world.requestSingleStep();
             }
         }
     }

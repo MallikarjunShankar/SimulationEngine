@@ -24,8 +24,23 @@ void World::update(float dt) {
 		pauseToggleRequested = false;
 	}
 
-	if (paused)
+	bool shouldAdvance = true;
+
+
+	if (paused) {
+		if (stepRequested) {
+			shouldAdvance = true;
+			stepRequested = false;
+		}
+
+		else {
+			shouldAdvance = false;
+		}
+	}
+
+	if (!shouldAdvance) {
 		return;
+	}
 
 	const float scaledDt = dt * timeScale;
 	simulationTime += scaledDt;
@@ -111,4 +126,8 @@ float World::getSimulationTime() const {
 
 void World::requestPauseToggle() {
 	pauseToggleRequested = true;
+}
+
+void World::requestSingleStep() {
+	stepRequested = true;
 }

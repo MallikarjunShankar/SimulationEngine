@@ -47,6 +47,8 @@ public:
 	void injectReplayInputs();
 	bool isReplayMode() const;
 
+	void resetWorld();
+
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::vector<std::unique_ptr<System>> systems;

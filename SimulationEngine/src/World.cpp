@@ -172,8 +172,8 @@ void World::recordInput(const std::string& command) {
 }
 
 void World::startReplay() {
+	resetWorld();
 	replayMode = true;
-	replayCursor = 0;
 }
 
 void World::stopReplay() {
@@ -208,4 +208,19 @@ void World::recordSpawn(const Vec2& position) {
 
 bool World::isReplayMode() const {
 	return replayMode;
+}
+
+void World::resetWorld() {
+	entities.clear();
+
+	frameIndex = 0;
+	simulationTime = 0.f;
+
+	pauseToggleRequested = false;
+	stepRequested = false;
+
+	paused = false;
+
+	replayCursor = 0;
+	timeScale = 1.f;
 }

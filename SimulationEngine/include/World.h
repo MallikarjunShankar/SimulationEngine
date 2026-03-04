@@ -2,8 +2,15 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include "Entity.h"
 #include "System.h"
+
+struct RecordedInput {
+	uint64_t frame;
+	std::string command;
+	Vec2 position;
+};
 
 class SpawnSystem;
 class World {
@@ -13,6 +20,7 @@ public:
 	void update(float dt);	
 	void render(sf::RenderWindow& window);
 	void enqueueSpawn(const Vec2& position);
+	void recordSpawn(const Vec2& position);
 
 private:
 	void cleanup();
@@ -31,9 +39,19 @@ public:
 	void requestTimeScaleDelta(float delta);
 	void requestTimeScaleReset();
 
+	uint64_t getFrameIndex() const;
+	void recordInput(const std::string& command);
+
+	void startReplay();
+	void stopReplay();
+	void injectReplayInputs();
+	bool isReplayMode() const;
+
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::vector<std::unique_ptr<System>> systems;
+	std::vector<RecordedInput> inputLog;
+
 	int nextId;
 	float width = 1280.f;
 	float height = 720.f;
@@ -48,4 +66,9 @@ private:
 	bool stepRequested = false;
 	float pendingTimeScaleDelta = 0.f;
 	bool resetTimeScaleRequested = false;
+
+	bool replayMode = false;
+	size_t replayCursor = 0;
+
+	uint64_t frameIndex = 0;
 };

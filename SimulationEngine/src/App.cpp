@@ -44,19 +44,19 @@ void App::processEvents()
         }
 
         // Mouse pressed
-        if (const auto* mouse =
-            event.getIf<sf::Event::MouseButtonPressed>())
-        {
-            if (mouse->button == sf::Mouse::Button::Left)
-            {
-                auto mousePos = sf::Mouse::getPosition(window);
+        if (!world.isReplayMode()) {
+            if (const auto* mouse =
+                event.getIf<sf::Event::MouseButtonPressed>()) {
+                if (mouse->button == sf::Mouse::Button::Left) {
+                    auto mousePos = sf::Mouse::getPosition(window);
 
-                Vec2 worldPos(
-                    static_cast<float>(mousePos.x),
-                    static_cast<float>(mousePos.y)
-                );
+                    Vec2 worldPos(
+                        static_cast<float>(mousePos.x),
+                        static_cast<float>(mousePos.y)
+                    );
 
-				world.enqueueSpawn(worldPos);
+                    world.enqueueSpawn(worldPos);
+                }
             }
         }
 

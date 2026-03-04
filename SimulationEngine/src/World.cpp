@@ -15,6 +15,7 @@ World::World() {
 }
 
 void World::enqueueSpawn(const Vec2& position) {
+	recordSpawn(position);
 	spawnSystem->enqueue({ position });
 }
 
@@ -40,6 +41,12 @@ void World::update(float dt) {
 
 	if (!shouldAdvance) {
 		return;
+	}
+
+	frameIndex++;
+
+	if (replayMode) {
+		injectReplayInputs();
 	}
 
 	if (resetTimeScaleRequested) {
@@ -139,10 +146,12 @@ float World::getSimulationTime() const {
 }
 
 void World::requestPauseToggle() {
+	recordInput("pause");
 	pauseToggleRequested = true;
 }
 
 void World::requestSingleStep() {
+	recordInput("step");
 	stepRequested = true;
 }
 
@@ -152,4 +161,51 @@ void World::requestTimeScaleDelta(float delta) {
 
 void World::requestTimeScaleReset() {
 	resetTimeScaleRequested = true;
+}
+
+void World::recordInput(const std::string& command) {
+	if (replayMode) {
+		return;
+	}
+
+	inputLog.push_back({ frameIndex, command });
+}
+
+void World::startReplay() {
+	replayMode = true;
+	replayCursor = 0;
+}
+
+void World::stopReplay() {
+	replayMode = false;
+}
+
+void World::injectReplayInputs() {
+	while (replayCursor < inputLog.size() && inputLog[replayCursor].frame == frameIndex) {
+		const auto& entry = inputLog[replayCursor];
+
+		if (entry.command == "spawn") {
+			spawnSystem->enqueue({ entry.position });
+		}
+
+		else if (entry.command == "pause") {
+			pauseToggleRequested = true;
+		}
+
+		else if (entry.command == "step") {
+			stepRequested = true;
+		}
+
+		replayCursor++;
+	}
+}
+
+void World::recordSpawn(const Vec2& position) {
+	if (replayMode) return;
+
+	inputLog.push_back({ frameIndex, "spawn", position });
+}
+
+bool World::isReplayMode() const {
+	return replayMode;
 }

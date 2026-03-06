@@ -2,6 +2,7 @@
 #include "Random.h"
 #include "ForceSystem.h"
 #include "SpawnSystem.h"
+#include <iostream>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
@@ -76,6 +77,8 @@ void World::update(float dt) {
 	}
 
 	cleanup();
+
+	recordStateHash();
 }
 
 void World::cleanup() {
@@ -145,13 +148,17 @@ float World::getSimulationTime() const {
 	return simulationTime;
 }
 
+uint64_t World::getFrameIndex() const {
+	return frameIndex;
+}
+
 void World::requestPauseToggle() {
-	recordInput("pause");
+	recordInput(InputCommand::Pause);
 	pauseToggleRequested = true;
 }
 
 void World::requestSingleStep() {
-	recordInput("step");
+	recordInput(InputCommand::Step);
 	stepRequested = true;
 }
 
@@ -163,12 +170,12 @@ void World::requestTimeScaleReset() {
 	resetTimeScaleRequested = true;
 }
 
-void World::recordInput(const std::string& command) {
+void World::recordInput(InputCommand command) {
 	if (replayMode) {
 		return;
 	}
 
-	inputLog.push_back({ frameIndex, command });
+	inputLog.push_back({ frameIndex, command, Vec2()});
 }
 
 void World::startReplay() {
@@ -184,43 +191,110 @@ void World::injectReplayInputs() {
 	while (replayCursor < inputLog.size() && inputLog[replayCursor].frame == frameIndex) {
 		const auto& entry = inputLog[replayCursor];
 
-		if (entry.command == "spawn") {
+		switch (entry.command)
+		{
+		case InputCommand::Spawn:
 			spawnSystem->enqueue({ entry.position });
-		}
+			break;
 
-		else if (entry.command == "pause") {
+		case InputCommand::Pause:
 			pauseToggleRequested = true;
-		}
+			break;
 
-		else if (entry.command == "step") {
+		case InputCommand::Step:
 			stepRequested = true;
+			break;
 		}
 
 		replayCursor++;
+	}
+
+	if (replayCursor >= inputLog.size()) {
+		replayMode = false;
 	}
 }
 
 void World::recordSpawn(const Vec2& position) {
 	if (replayMode) return;
 
-	inputLog.push_back({ frameIndex, "spawn", position });
+	inputLog.push_back({ frameIndex, InputCommand::Spawn, position });
 }
 
 bool World::isReplayMode() const {
 	return replayMode;
 }
 
-void World::resetWorld() {
+void World::resetWorld()
+{
 	entities.clear();
 
 	frameIndex = 0;
 	simulationTime = 0.f;
 
+	paused = false;
 	pauseToggleRequested = false;
 	stepRequested = false;
 
-	paused = false;
+	timeScale = 1.f;
 
 	replayCursor = 0;
-	timeScale = 1.f;
+
+	replayHashes.clear();
+}
+
+uint64_t World::computeStateHash() const {
+	uint64_t hash = 1469598103934665603ULL;
+
+	for (const auto& e : entities) {
+		const Entity& entity = *e;
+
+		auto mix = [&](uint64_t value) {
+			hash ^= value;
+			hash *= 1099511628211ULL;
+			};
+
+		mix(entity.id);
+		
+		mix(static_cast<uint64_t>(entity.position.x * 1000));
+		mix(static_cast<uint64_t>(entity.position.y * 1000));
+
+		mix(static_cast<uint64_t>(entity.velocity.x * 1000));
+		mix(static_cast<uint64_t>(entity.velocity.y * 1000));
+
+		mix(static_cast<uint64_t>(entity.energy));
+
+		mix(entity.alive ? 1 : 0);
+	}
+	return hash;
+}
+
+void World::recordStateHash() {
+	uint64_t hash = computeStateHash();
+
+	if (!replayMode) {
+		stateHashes.push_back(hash);
+	}
+	else {
+		replayHashes.push_back(hash);
+		validateReplayHash(hash);
+	}
+}
+
+void World::validateReplayHash(uint64_t hash) {
+	if (frameIndex == 0 || frameIndex - 1 >= stateHashes.size()) {
+		return;
+	}
+
+	uint64_t expected = stateHashes[frameIndex - 1];
+
+	if (hash != expected) {
+		std::cout << "Determinism failure at frame " << frameIndex << std::endl;
+		std::cout << "Expected: " << expected << std::endl;
+		std::cout << "Actual: " << hash << std::endl;
+	}
+}
+
+size_t World::getEntityCount() const
+{
+	return entities.size();
 }

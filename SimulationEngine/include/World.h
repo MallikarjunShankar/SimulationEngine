@@ -3,12 +3,19 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <cstdint>
 #include "Entity.h"
 #include "System.h"
 
+enum class InputCommand {
+	Spawn,
+	Pause, 
+	Step
+};
+
 struct RecordedInput {
 	uint64_t frame;
-	std::string command;
+	InputCommand command;
 	Vec2 position;
 };
 
@@ -40,7 +47,7 @@ public:
 	void requestTimeScaleReset();
 
 	uint64_t getFrameIndex() const;
-	void recordInput(const std::string& command);
+	void recordInput(InputCommand command);
 
 	void startReplay();
 	void stopReplay();
@@ -48,11 +55,17 @@ public:
 	bool isReplayMode() const;
 
 	void resetWorld();
+	uint64_t computeStateHash() const;
+	void recordStateHash();
+	void validateReplayHash(uint64_t hash);
+	size_t getEntityCount() const;
 
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::vector<std::unique_ptr<System>> systems;
 	std::vector<RecordedInput> inputLog;
+	std::vector<uint64_t> stateHashes;
+	std::vector<uint64_t> replayHashes;
 
 	int nextId;
 	float width = 1280.f;

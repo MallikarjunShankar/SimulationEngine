@@ -1,11 +1,22 @@
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "App.h"
 #include "World.h"
 
 App::App()
-:	window(sf::VideoMode({1280, 720}), "Simulation Engine")
+    : window(sf::VideoMode({ 1280, 720 }), "Simulation Engine")
 {
-	window.setFramerateLimit(144);
+    window.setFramerateLimit(144);
 
+    if (!debugFont.openFromFile("arial.ttf")) {
+        std::cout << "Failed to load font\n";
+    }
+
+    debugText.setFont(debugFont);
+    debugText.setCharacterSize(14);
+    debugText.setFillColor(sf::Color::White);
+    debugText.setPosition({ 10.f, 10.f });
 }
 
 void App::run() {
@@ -91,7 +102,22 @@ void App::update(float dt) {
        
 
 void App::render() {
-	window.clear();
-	world.render(window);
-	window.display();
+    window.clear();
+    world.render(window);
+
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(2) << world.getTimeScale();
+
+    std::string overlay =
+        "Frame: " + std::to_string(world.getFrameIndex()) +
+        "\nEntities: " + std::to_string(world.getEntityCount()) +
+        "\nTimeScale: " + ss.str() +
+        "\nPaused: " + std::string(world.isPaused() ? "YES" : "NO") +
+        "\nReplay: " + std::string(world.isReplayMode() ? "ON" : "OFF");
+
+    debugText.setString(overlay);
+
+    debugText.setString(overlay);
+    window.draw(debugText);
+    window.display();
 }

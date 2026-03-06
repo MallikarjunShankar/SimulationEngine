@@ -16,4 +16,6 @@ private:
 private:
 	sf::RenderWindow window;
 	World world;
+	sf::Font debugFont;
+	sf::Text debugText{ debugFont };
 };

@@ -16,11 +16,23 @@ World::World() {
 }
 
 void World::enqueueSpawn(const Vec2& position) {
-	recordSpawn(position);
-	spawnSystem->enqueue({ position });
+
+	Vec2 velocity(
+		Random::range(-100.f, 100.f),
+		Random::range(-100.f, 100.f)
+	);
+
+	recordSpawn(position, velocity);
+
+	spawnSystem->enqueue({ position, velocity });
 }
 
 void World::update(float dt) {
+
+	if (replayMode) {
+		injectReplayInputs();
+	}
+
 	if (pauseToggleRequested) {
 		paused = !paused;
 		pauseToggleRequested = false;
@@ -28,13 +40,11 @@ void World::update(float dt) {
 
 	bool shouldAdvance = true;
 
-
 	if (paused) {
 		if (stepRequested) {
 			shouldAdvance = true;
 			stepRequested = false;
 		}
-
 		else {
 			shouldAdvance = false;
 		}
@@ -44,20 +54,15 @@ void World::update(float dt) {
 		return;
 	}
 
-	frameIndex++;
-
-	if (replayMode) {
-		injectReplayInputs();
-	}
-
 	if (resetTimeScaleRequested) {
 		timeScale = 1.f;
 		resetTimeScaleRequested = false;
 	}
 
 	if (pendingTimeScaleDelta != 0.f) {
+		recordInput(InputCommand::TimeScaleDelta);
 		timeScale += pendingTimeScaleDelta;
-		
+
 		if (timeScale < 0.f) timeScale = 0.f;
 		if (timeScale > 4.f) timeScale = 4.f;
 
@@ -79,6 +84,7 @@ void World::update(float dt) {
 	cleanup();
 
 	recordStateHash();
+	frameIndex++;
 }
 
 void World::cleanup() {
@@ -163,10 +169,20 @@ void World::requestSingleStep() {
 }
 
 void World::requestTimeScaleDelta(float delta) {
+
+	if (!replayMode) {
+		if (delta > 0.f) {
+			recordInput(InputCommand::TimeScaleUp);
+		} else {
+			recordInput(InputCommand::TimeScaleDown);
+		}
+	}
+
 	pendingTimeScaleDelta += delta;
 }
 
 void World::requestTimeScaleReset() {
+	recordInput(InputCommand::TimeScaleReset);
 	resetTimeScaleRequested = true;
 }
 
@@ -175,11 +191,13 @@ void World::recordInput(InputCommand command) {
 		return;
 	}
 
-	inputLog.push_back({ frameIndex, command, Vec2()});
+	inputLog.push_back({ frameIndex + 1, command, Vec2()});
 }
 
 void World::startReplay() {
 	resetWorld();
+
+	replayCursor = 0;
 	replayMode = true;
 }
 
@@ -194,7 +212,7 @@ void World::injectReplayInputs() {
 		switch (entry.command)
 		{
 		case InputCommand::Spawn:
-			spawnSystem->enqueue({ entry.position });
+			spawnSystem->enqueue({ entry.position, entry.velocity });
 			break;
 
 		case InputCommand::Pause:
@@ -203,6 +221,18 @@ void World::injectReplayInputs() {
 
 		case InputCommand::Step:
 			stepRequested = true;
+			break;
+
+		case InputCommand::TimeScaleUp:
+			pendingTimeScaleDelta += 0.25f;
+			break;
+
+		case InputCommand::TimeScaleDown:
+			pendingTimeScaleDelta -= 0.25f;
+			break;
+
+		case InputCommand::TimeScaleReset:
+			resetTimeScaleRequested = true;
 			break;
 		}
 
@@ -214,10 +244,17 @@ void World::injectReplayInputs() {
 	}
 }
 
-void World::recordSpawn(const Vec2& position) {
-	if (replayMode) return;
+void World::recordSpawn(const Vec2& position, const Vec2& velocity) {
 
-	inputLog.push_back({ frameIndex, InputCommand::Spawn, position });
+	if (replayMode)
+		return;
+
+	inputLog.push_back({
+		frameIndex + 1,
+		InputCommand::Spawn,
+		position,
+		velocity
+		});
 }
 
 bool World::isReplayMode() const {
@@ -281,11 +318,18 @@ void World::recordStateHash() {
 }
 
 void World::validateReplayHash(uint64_t hash) {
-	if (frameIndex == 0 || frameIndex - 1 >= stateHashes.size()) {
+
+	if (frameIndex == 0) {
 		return;
 	}
 
-	uint64_t expected = stateHashes[frameIndex - 1];
+	size_t index = frameIndex - 1;
+
+	if (index >= stateHashes.size()) {
+		return;
+	}
+
+	uint64_t expected = stateHashes[index];
 
 	if (hash != expected) {
 		std::cout << "Determinism failure at frame " << frameIndex << std::endl;

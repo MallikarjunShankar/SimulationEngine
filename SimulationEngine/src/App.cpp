@@ -3,10 +3,11 @@
 #include <iomanip>
 #include "App.h"
 #include "World.h"
+#include "OperatorController.h"
 
 App::App()
-    : window(sf::VideoMode({ 1280, 720 }), "Simulation Engine")
-{
+    : window(sf::VideoMode({ 1280, 720 }), "Simulation Engine"),
+    controller(world) {
     window.setFramerateLimit(144);
 
     if (!debugFont.openFromFile("arial.ttf")) {
@@ -21,40 +22,37 @@ App::App()
 
 void App::run() {
 
-	const float dt = 1.f / 120.f;
+    const float dt = 1.f / 120.f;
 
-	sf::Clock clock;
-	float accumulator = 0.f; 
+    sf::Clock clock;
+    float accumulator = 0.f;
 
-	while (window.isOpen()) {
+    while (window.isOpen()) {
 
-		float frameTime = clock.restart().asSeconds();
-		accumulator += frameTime;
+        float frameTime = clock.restart().asSeconds();
+        accumulator += frameTime;
 
-		processEvents();
+        processEvents();
 
-		while (accumulator >= dt) {
-			update(dt);
-			accumulator -= dt;
-		}
-		
-		render();
-	}
+        while (accumulator >= dt) {
+            update(dt);
+            accumulator -= dt;
+        }
+
+        render();
+    }
 }
 
-void App::processEvents()
-{
+void App::processEvents() {
     while (auto optEvent = window.pollEvent())
     {
         const sf::Event& event = *optEvent;
 
-        // Window close
         if (const auto* closed = event.getIf<sf::Event::Closed>())
         {
             window.close();
         }
 
-        // Mouse pressed
         if (!world.isReplayMode()) {
             if (const auto* mouse =
                 event.getIf<sf::Event::MouseButtonPressed>()) {
@@ -71,27 +69,8 @@ void App::processEvents()
             }
         }
 
-        if (const auto* key = event.getIf<sf::Event::KeyPressed>())
-        {
-            if (key->code == sf::Keyboard::Key::Space) {
-                world.requestPauseToggle();
-            }
-
-            if (key->code == sf::Keyboard::Key::Right) {
-                world.requestSingleStep();
-            }
-
-            if (key->code == sf::Keyboard::Key::Up) {
-                world.requestTimeScaleDelta(0.25f);
-            }
-
-            if (key->code == sf::Keyboard::Key::Down) {
-                world.requestTimeScaleDelta(-0.25f);
-			}
-
-            if (key->code == sf::Keyboard::Key::R) {
-                world.requestTimeScaleReset();
-            }
+        if (const auto* key = event.getIf<sf::Event::KeyPressed>()) {
+            controller.handleKey(*key);
         }
     }
 }
@@ -99,7 +78,6 @@ void App::processEvents()
 void App::update(float dt) {
     world.update(dt);
 }
-       
 
 void App::render() {
     window.clear();
@@ -117,7 +95,6 @@ void App::render() {
 
     debugText.setString(overlay);
 
-    debugText.setString(overlay);
     window.draw(debugText);
     window.display();
 }

@@ -23,6 +23,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\ForceSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OperatorController.cpp" />
     <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\SpawnSystem.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\ForceSystem.h" />
+    <ClInclude Include="include\OperatorController.h" />
     <ClInclude Include="include\Physics.h" />
     <ClInclude Include="include\Random.h" />
     <ClInclude Include="include\SpawnRequest.h" />

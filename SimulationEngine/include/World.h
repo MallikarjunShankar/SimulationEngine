@@ -10,13 +10,18 @@
 enum class InputCommand {
 	Spawn,
 	Pause, 
-	Step
+	Step,
+	TimeScaleDelta,
+	TimeScaleReset,
+	TimeScaleUp,
+	TimeScaleDown
 };
 
 struct RecordedInput {
 	uint64_t frame;
 	InputCommand command;
 	Vec2 position;
+	Vec2 velocity;
 };
 
 class SpawnSystem;
@@ -27,7 +32,7 @@ public:
 	void update(float dt);	
 	void render(sf::RenderWindow& window);
 	void enqueueSpawn(const Vec2& position);
-	void recordSpawn(const Vec2& position);
+	void recordSpawn(const Vec2& position, const Vec2& velocity);
 
 private:
 	void cleanup();

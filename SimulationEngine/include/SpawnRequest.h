@@ -4,4 +4,5 @@
 
 struct SpawnRequest {
 	Vec2 position;
+	Vec2 velocity;
 };

@@ -1,60 +1,195 @@
-# Simulation Engine
+# Deterministic Simulation Sandbox
 
-A deterministic 2D simulation engine written in C++ using SFML.
+A deterministic 2D simulation sandbox built from scratch in C++ using SFML 3.
 
-The purpose of this project is to study and implement core simulation architecture including deterministic update pipelines, system based design, and reproducible simulation behavior. The project is not intended to be a game engine. Instead it is an experimental environment for understanding how simulation systems evolve and interact over time.
+This project focuses on building a reproducible simulation environment with a clean architecture rather than creating a traditional game engine. The system is designed to explore deterministic update pipelines, replayable simulations, and controlled experimentation within a physics-based environment.
 
-## Current Features
+The long term objective is to evolve the engine into a platform for studying artificial agents, emergent behavior, and complex system simulations.
 
-Fixed timestep simulation loop with accumulator based update control
+---
 
-Custom Vec2 math system supporting vector arithmetic and normalization
+## Core Characteristics
 
-Entity based simulation objects containing position, velocity, acceleration, mass, radius, energy, and lifecycle state
+Deterministic execution is the central design principle. Given the same initial state, ordered inputs, and timestep, the simulation must always produce identical results.
 
-World manager responsible for entity ownership, ordered system execution, physics integration, and cleanup
+The architecture emphasizes:
 
-System architecture where simulation rules operate over populations of entities
+* explicit ownership of simulation state
+* strict authority boundaries
+* replayable command streams
+* reproducible simulation runs
+* architecture-first development
 
-Spawn request pipeline where input generates deterministic spawn events processed during simulation updates
+All simulation state changes occur exclusively inside the `World.update()` step.
 
-Constant force simulation with semi implicit Euler integration and linear damping
+---
 
-Boundary collision resolution with velocity reflection
+## Architecture Overview
 
-Deterministic simulation timeline using a discrete frame index
+Execution hierarchy:
 
-Simulation time authority supporting pause, slow motion, and single step debugging
+```
+main()
+  → App
+      → OperatorController
+          → World
+              → Systems
+                  → Entities
+                      → Vec2
+```
 
-Input recording and replay infrastructure allowing deterministic re simulation of recorded runs
+### Responsibilities
 
-Basic rendering pipeline using SFML for visualizing simulation state
+**App**
 
-## Goals
+Handles the runtime environment, window management, and rendering.
 
-Build a stable deterministic simulation framework that can support long running experiments
+**OperatorController**
 
-Explore emergent behavior and artificial agent systems within controlled simulation environments
+Interprets user input and converts it into simulation commands.
 
-Develop scalable system oriented architecture suitable for complex simulation rules
+**World**
 
-Study deterministic replay techniques used in physics engines and networked simulations
+Owns and advances the entire simulation state.
+World is the sole authority for all simulation changes.
 
-Use the project as a platform for learning simulation design, engine architecture, and reproducible systems
+**Systems**
 
-## Tech Stack
+Operate on entity populations and apply simulation rules.
 
-C++20
+**Entities**
 
-SFML 3
+State containers representing physical objects in the simulation.
 
-Visual Studio
+---
 
-Git and GitHub
+## Implemented Systems
 
-## Status
+### ForceSystem
 
-Early stage development. The current focus is on deterministic simulation architecture, replay foundations, and system level design before expanding into more advanced simulation features.
+Applies constant forces to entities.
+
+### SpawnSystem
+
+Processes queued spawn requests and creates entities through the world pipeline.
+
+---
+
+## Deterministic Replay System
+
+The engine records operator commands and can replay them deterministically.
+
+Recorded commands include:
+
+* entity spawning
+* pause / resume
+* single frame stepping
+* time scale adjustments
+* simulation reset events
+
+During replay the engine re-injects recorded commands at the exact simulation frame they originally occurred.
+
+A world state hash is generated every frame and compared during replay to detect divergence.
+
+---
+
+## Simulation Features
+
+Current capabilities include:
+
+* deterministic fixed timestep simulation
+* entity spawning through a queued pipeline
+* semi-implicit Euler integration
+* linear damping
+* boundary collision and reflection
+* deterministic replay and verification
+* state hash validation
+* simulation pause and single-step debugging
+* adjustable simulation time scale
+* simulation reset and replay controls
+* real-time debug overlay
+
+The debug overlay displays:
+
+* frame number
+* entity count
+* current time scale
+* pause state
+* replay state
+
+---
+
+## Operator Controls
+
+| Input       | Action                    |
+| ----------- | ------------------------- |
+| Left Click  | Spawn entity              |
+| Space       | Pause / resume simulation |
+| Right Arrow | Advance one frame         |
+| Up Arrow    | Increase time scale       |
+| Down Arrow  | Decrease time scale       |
+| R           | Reset time scale          |
+| C           | Clear simulation          |
+| T           | Start replay              |
+
+---
+
+## Technology Stack
+
+Language: C++20
+Graphics Library: SFML 3
+IDE: Visual Studio
+Platform: Windows
+
+Compiler settings:
+
+* x64
+* /W4
+* /WX (warnings treated as errors)
+
+---
+
+## Project Goals
+
+The engine is being developed to study:
+
+* deterministic simulation architecture
+* reproducible simulation environments
+* simulation debugging tools
+* command stream replay systems
+* emergent behavior foundations
+* artificial agent experimentation
+
+The project prioritizes architectural clarity and determinism over rapid feature development.
+
+---
+
+## Development Philosophy
+
+The engine follows strict rules:
+
+* all simulation changes occur inside `World.update()`
+* systems do not create or destroy entities directly
+* input records operator intent rather than mutating state
+* randomness affecting simulation outcomes must be deterministic or recorded
+
+These constraints ensure simulations remain reproducible and debuggable.
+
+---
+
+## Current Status
+
+The project currently functions as a deterministic simulation sandbox capable of recording and replaying operator actions while validating simulation consistency.
+
+Future development will expand the sandbox with features such as:
+
+* simulation snapshots and rollback
+* experiment branching
+* entity inspection tools
+* scenario loading
+* artificial agent simulation systems
+
+---
 
 ## Author
 
